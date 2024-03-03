@@ -1,16 +1,22 @@
 import pytest
 
-from endpoints.create_object import CreateObject
-from endpoints.delete_object import DeleteObject
-
 from genetators.entity import EntityGenerator
+from lib.module.service_test_api import ServiceTestApi
 
 
 @pytest.fixture()
-def obj_id():
-    create_object = CreateObject()
+def create_object():
     payload = EntityGenerator.random()
-    create_object.create_entity(payload)
-    yield create_object.response_txt
-    delete_object = DeleteObject()
-    delete_object.delete_entity_by_id(create_object.response_txt)
+    service = ServiceTestApi()
+    res = service.create_entity(payload)
+    return res
+
+
+def delete_object_by_id(obj_id):
+    service = ServiceTestApi()
+    service.delete_entity_by_id(obj_id)
+
+
+@pytest.fixture()
+def delete_object():
+    yield delete_object_by_id

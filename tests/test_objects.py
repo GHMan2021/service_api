@@ -1,9 +1,6 @@
-from endpoints.create_object import CreateObject
-from endpoints.delete_object import DeleteObject
-from endpoints.get_all_objects import GetAllObjects
-from endpoints.get_object import GetObject
-from endpoints.update_object import UpdateObject
 from genetators.entity import EntityGenerator
+from lib.module.service_test_api import ServiceTestApi
+from lib.service_test_api import check_validate_response
 from schemas.entity import Entity
 import allure
 
@@ -15,33 +12,40 @@ import allure
 
     Шаги:
     1. Сделать запрос на создание сущности
-    2. Проверить статус ответа""")
-def test_create_entity():
+    2. Проверить статус ответа
+    3. Проверить тип возвращаемого ответа""")
+def test_create_entity(delete_object):
     with allure.step("Запрос на создание сущности"):
         payload = EntityGenerator.random()
-        new_object_endpoint = CreateObject()
-        new_object_endpoint.create_entity(payload)
+        new_object_endpoint = ServiceTestApi()
+        res = new_object_endpoint.create_entity(payload)
+        res_txt = res.text
+        delete_object(res_txt)
 
     with allure.step("Проверка статуса ответа сервиса"):
-        new_object_endpoint.check_status_code(200)
-        new_object_endpoint.check_type_response()
+        assert res.status_code == 200, f"{res.status_code} - неверный статус код"
+
+    with allure.step("Проверка типа возвращаемого ответа"):
+        assert isinstance(res_txt, str), "Не текстовое значение ответа сервиса"
+        assert isinstance(int(res_txt), int), "Не числовой id в ответе сервиса"
 
 
 @allure.feature('ServiceTest')
 @allure.title('Удаление сущности')
 @allure.description("""
-    Цель: Проверить удалени сущности
+    Цель: Проверить удаление сущности
 
     Шаги:
     1. Сделать запрос на удаление сущности
     2. Проверить статус ответа""")
-def test_delete_entity(obj_id):
+def test_delete_entity(create_object):
     with allure.step("Запрос на удаление сущности"):
-        delete_obj_endpoint = DeleteObject()
-        delete_obj_endpoint.delete_entity_by_id(obj_id)
+        obj_id = create_object.text
+        delete_obj_endpoint = ServiceTestApi()
+        res = delete_obj_endpoint.delete_entity_by_id(obj_id)
 
     with allure.step("Проверка статуса ответа сервиса"):
-        delete_obj_endpoint.check_status_code(204)
+        assert res.status_code == 204, f"{res.status_code} - неверный статус код"
 
 
 @allure.feature('ServiceTest')
@@ -53,16 +57,19 @@ def test_delete_entity(obj_id):
     1. Сделать запрос на получение сущности
     2. Проверить статус ответа
     3. Валидировать полученные данные""")
-def test_get_entity(obj_id):
+def test_get_entity(create_object, delete_object):
     with allure.step("Запрос на получение сущности"):
-        get_obj_endpoint = GetObject()
-        get_obj_endpoint.get_entity_by_id(obj_id)
+        obj_id = create_object.text
+        get_obj_endpoint = ServiceTestApi()
+        res = get_obj_endpoint.get_entity_by_id(obj_id)
+        res_json = res.json()
+        delete_object(obj_id)
 
     with allure.step("Проверка статуса ответа сервиса"):
-        get_obj_endpoint.check_status_code(200)
+        assert res.status_code == 200, f"{res.status_code} - неверный статус код"
 
     with allure.step("Проверка валидности полученных данных"):
-        get_obj_endpoint.check_validate_response(Entity)
+        check_validate_response(res_json, Entity)
 
 
 @allure.feature('ServiceTest')
@@ -74,15 +81,19 @@ def test_get_entity(obj_id):
     1. Сделать запрос на получение всех сущностей
     2. Проверить статус ответа
     3. Валидировать полученные данные""")
-def test_get_all_entities():
+def test_get_all_entities(create_object, delete_object):
     with allure.step("Запрос на получение всех сущностей"):
-        get_all_objs_endpoint = GetAllObjects()
-        get_all_objs_endpoint.get_all_entities()
+        obj_id = create_object.text
+        get_all_objs_endpoint = ServiceTestApi()
+        res = get_all_objs_endpoint.get_all_entities()
+        res_json = res.json().get('entity')
+        delete_object(obj_id)
 
     with allure.step("Проверка статуса ответа сервиса"):
-        get_all_objs_endpoint.check_status_code(200)
+        assert res.status_code == 200, f"{res.status_code} - неверный статус код"
+
     with allure.step("Проверка валидности полученных данных"):
-        get_all_objs_endpoint.check_validate_response(Entity)
+        check_validate_response(res_json, Entity)
 
 
 @allure.feature('ServiceTest')
@@ -93,11 +104,13 @@ def test_get_all_entities():
     Шаги:
     1. Сделать запрос на обновление сущности
     2. Проверить статус ответа""")
-def test_update_entity(obj_id):
+def test_update_entity(create_object, delete_object):
     with allure.step("Запрос на обновление сущности"):
+        obj_id = create_object.text
         payload = EntityGenerator.random()
-        update_obj_endpoint = UpdateObject()
-        update_obj_endpoint.update_entity_by_id(obj_id, payload)
+        update_obj_endpoint = ServiceTestApi()
+        res = update_obj_endpoint.update_entity_by_id(obj_id, payload)
+        delete_object(obj_id)
 
     with allure.step("Проверка статуса ответа сервиса"):
-        update_obj_endpoint.check_status_code(204)
+        assert res.status_code == 204, f"{res.status_code} - неверный статус код"

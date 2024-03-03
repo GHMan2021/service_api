@@ -11,4 +11,3 @@ class GetObject(Endpoint):
 
     def check_validate_response(self, schema):
         schema.model_validate(self.response_json)
-
