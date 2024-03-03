@@ -12,11 +12,10 @@ def create_object():
     return res
 
 
-def delete_object_by_id(obj_id):
-    service = ServiceTestApi()
-    service.delete_entity_by_id(obj_id)
-
-
 @pytest.fixture()
 def delete_object():
-    yield delete_object_by_id
+    obj_ids = []
+    yield obj_ids
+    for obj_id in obj_ids:
+        service = ServiceTestApi()
+        service.delete_entity_by_id(obj_id)

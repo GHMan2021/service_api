@@ -20,7 +20,7 @@ def test_create_entity(delete_object):
         new_object_endpoint = ServiceTestApi()
         res = new_object_endpoint.create_entity(payload)
         res_txt = res.text
-        delete_object(res_txt)
+        delete_object.append(res_txt)
 
     with allure.step("Проверка статуса ответа сервиса"):
         assert res.status_code == 200, f"{res.status_code} - неверный статус код"
@@ -60,10 +60,11 @@ def test_delete_entity(create_object):
 def test_get_entity(create_object, delete_object):
     with allure.step("Запрос на получение сущности"):
         obj_id = create_object.text
+        delete_object.append(obj_id)
+
         get_obj_endpoint = ServiceTestApi()
         res = get_obj_endpoint.get_entity_by_id(obj_id)
         res_json = res.json()
-        delete_object(obj_id)
 
     with allure.step("Проверка статуса ответа сервиса"):
         assert res.status_code == 200, f"{res.status_code} - неверный статус код"
@@ -84,10 +85,11 @@ def test_get_entity(create_object, delete_object):
 def test_get_all_entities(create_object, delete_object):
     with allure.step("Запрос на получение всех сущностей"):
         obj_id = create_object.text
+        delete_object.append(obj_id)
+
         get_all_objs_endpoint = ServiceTestApi()
         res = get_all_objs_endpoint.get_all_entities()
         res_json = res.json().get('entity')
-        delete_object(obj_id)
 
     with allure.step("Проверка статуса ответа сервиса"):
         assert res.status_code == 200, f"{res.status_code} - неверный статус код"
@@ -107,10 +109,11 @@ def test_get_all_entities(create_object, delete_object):
 def test_update_entity(create_object, delete_object):
     with allure.step("Запрос на обновление сущности"):
         obj_id = create_object.text
+        delete_object.append(obj_id)
+
         payload = EntityGenerator.random()
         update_obj_endpoint = ServiceTestApi()
         res = update_obj_endpoint.update_entity_by_id(obj_id, payload)
-        delete_object(obj_id)
 
     with allure.step("Проверка статуса ответа сервиса"):
         assert res.status_code == 204, f"{res.status_code} - неверный статус код"
