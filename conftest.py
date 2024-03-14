@@ -1,6 +1,6 @@
 import pytest
 
-from genetators.entity import EntityGenerator
+from generators.entity import EntityGenerator
 from lib.module.service_test_api import ServiceTestApi
 
 

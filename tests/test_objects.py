@@ -1,4 +1,4 @@
-from genetators.entity import EntityGenerator
+from generators.entity import EntityGenerator
 from lib.module.service_test_api import ServiceTestApi
 from lib.service_test_api import check_validate_response
 from schemas.entity import Entity
