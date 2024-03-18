@@ -13,14 +13,20 @@ import allure
     Шаги:
     1. Сделать запрос на создание сущности
     2. Проверить статус ответа
-    3. Проверить тип возвращаемого ответа""")
+    3. Проверить тип возвращаемого ответа
+    
+    Постусловие: 
+        - Удалить тестовые данные
+        
+    Ожидаемый результат:
+        - Сущность создана""")
 def test_create_entity(delete_object):
     with allure.step("Запрос на создание сущности"):
         payload = EntityGenerator.random()
         new_object_endpoint = ServiceTestApi()
         res = new_object_endpoint.create_entity(payload)
         res_txt = res.text
-        delete_object.append(res_txt)
+        delete_object.append(int(res_txt))
 
     with allure.step("Проверка статуса ответа сервиса"):
         assert res.status_code == 200, f"{res.status_code} - неверный статус код"
@@ -37,10 +43,16 @@ def test_create_entity(delete_object):
 
     Шаги:
     1. Сделать запрос на удаление сущности
-    2. Проверить статус ответа""")
+    2. Проверить статус ответа
+    
+    Постусловие: 
+        - Удалить тестовые данные
+        
+    Ожидаемый результат:
+        - Сущность удалена""")
 def test_delete_entity(create_object):
     with allure.step("Запрос на удаление сущности"):
-        obj_id = create_object.text
+        obj_id = int(create_object.text)
         delete_obj_endpoint = ServiceTestApi()
         res = delete_obj_endpoint.delete_entity_by_id(obj_id)
 
@@ -56,10 +68,16 @@ def test_delete_entity(create_object):
     Шаги:
     1. Сделать запрос на получение сущности
     2. Проверить статус ответа
-    3. Валидировать полученные данные""")
+    3. Валидировать полученные данные
+    
+    Постусловие: 
+        - Удалить тестовые данные
+        
+    Ожидаемый результат:
+        - Сущность получена""")
 def test_get_entity(create_object, delete_object):
     with allure.step("Запрос на получение сущности"):
-        obj_id = create_object.text
+        obj_id = int(create_object.text)
         delete_object.append(obj_id)
 
         get_obj_endpoint = ServiceTestApi()
@@ -81,10 +99,16 @@ def test_get_entity(create_object, delete_object):
     Шаги:
     1. Сделать запрос на получение всех сущностей
     2. Проверить статус ответа
-    3. Валидировать полученные данные""")
+    3. Валидировать полученные данные
+    
+    Постусловие: 
+        - Удалить тестовые данные
+        
+    Ожидаемый результат:
+        - Сущности получены""")
 def test_get_all_entities(create_object, delete_object):
     with allure.step("Запрос на получение всех сущностей"):
-        obj_id = create_object.text
+        obj_id = int(create_object.text)
         delete_object.append(obj_id)
 
         get_all_objs_endpoint = ServiceTestApi()
@@ -105,10 +129,16 @@ def test_get_all_entities(create_object, delete_object):
 
     Шаги:
     1. Сделать запрос на обновление сущности
-    2. Проверить статус ответа""")
+    2. Проверить статус ответа
+    
+    Постусловие: 
+        - Удалить тестовые данные
+        
+    Ожидаемый результат:
+        - Сущность обновлена""")
 def test_update_entity(create_object, delete_object):
     with allure.step("Запрос на обновление сущности"):
-        obj_id = create_object.text
+        obj_id = int(create_object.text)
         delete_object.append(obj_id)
 
         payload = EntityGenerator.random()
